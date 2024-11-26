@@ -1,66 +1,88 @@
-// Scene Setup
-var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-var renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.getElementById('scene-container').appendChild(renderer.domElement);
+import * as THREE from 'three';
 
-// Lighting
-var ambientLight = new THREE.AmbientLight(0x404040); // Ambient light
-scene.add(ambientLight);
+let scene, camera, renderer, car;
 
-var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-directionalLight.position.set(5, 5, 5).normalize();
-scene.add(directionalLight);
+function init() {
+  // Create scene
+  scene = new THREE.Scene();
 
-// Create the car body (simple box shape for now)
-var carBodyGeometry = new THREE.BoxGeometry(2, 0.5, 1);
-var carBodyMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
-var carBody = new THREE.Mesh(carBodyGeometry, carBodyMaterial);
-scene.add(carBody);
+  // Create camera
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 5;
 
-// Create wheels (simple spheres for now)
-var wheelGeometry = new THREE.SphereGeometry(0.25, 32, 32);
-var wheelMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });
+  // Create renderer
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
 
-var wheel1 = new THREE.Mesh(wheelGeometry, wheelMaterial);
-wheel1.position.set(-0.75, -0.25, 0.5);
-scene.add(wheel1);
+  // Create car (basic shapes for demonstration)
+  const carBody = new THREE.Mesh(
+    new THREE.BoxGeometry(2, 1, 0.5),
+    new THREE.MeshBasicMaterial({ color: 0xff0000 })
+  );
+  carBody.position.set(0, 0, 0);
 
-var wheel2 = new THREE.Mesh(wheelGeometry, wheelMaterial);
-wheel2.position.set(0.75, -0.25, 0.5);
-scene.add(wheel2);
+  const wheel1 = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.4, 0.4, 0.2, 32),
+    new THREE.MeshBasicMaterial({ color: 0x333333 })
+  );
+  wheel1.position.set(-0.7, -0.5, 0);
 
-var wheel3 = new THREE.Mesh(wheelGeometry, wheelMaterial);
-wheel3.position.set(-0.75, -0.25, -0.5);
-scene.add(wheel3);
+  const wheel2 = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.4, 0.4, 0.2, 32),
+    new THREE.MeshBasicMaterial({ color: 0x333333 })
+  );
+  wheel2.position.set(0.7, -0.5, 0);
 
-var wheel4 = new THREE.Mesh(wheelGeometry, wheelMaterial);
-wheel4.position.set(0.75, -0.25, -0.5);
-scene.add(wheel4);
+  const wheel3 = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.4, 0.4, 0.2, 32),
+    new THREE.MeshBasicMaterial({ color: 0x333333 })
+  );
+  wheel3.position.set(-0.7, -0.5, -1);
 
-// Set the camera position
-camera.position.z = 5;
+  const wheel4 = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.4, 0.4, 0.2, 32),
+    new THREE.MeshBasicMaterial({ color: 0x333333 })
+  );
+  wheel4.position.set(0.7, -0.5, -1);
 
-// Animation Loop
-function animate() {
-    requestAnimationFrame(animate);
+  car = new THREE.Group();
+  car.add(carBody);
+  car.add(wheel1);
+  car.add(wheel2);
+  car.add(wheel3);
+  car.add(wheel4);
 
-    // Rotate the car body and wheels for some basic animation
-    carBody.rotation.y += 0.01;
-    wheel1.rotation.x += 0.1;
-    wheel2.rotation.x += 0.1;
-    wheel3.rotation.x += 0.1;
-    wheel4.rotation.x += 0.1;
+  scene.add(car);
 
-    renderer.render(scene, camera);
+  // Add ambient light
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+  scene.add(ambientLight);
+
+  // Add directional light
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+  directionalLight.position.set(5, 5, 5).normalize();
+  scene.add(directionalLight);
+
+  animate();
 }
 
-animate();
-
 // Handle window resizing
-window.addEventListener('resize', function () {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+window.addEventListener('resize', () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
 });
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  // Rotate car for animation effect
+  car.rotation.x += 0.01;
+  car.rotation.y += 0.01;
+
+  // Render the scene
+  renderer.render(scene, camera);
+}
+
+init();
